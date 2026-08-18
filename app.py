@@ -94,20 +94,24 @@ DEFAULT_MODEL = os.environ.get("MODEL", "openai/gpt-4.1-mini")
 
 # Models offered in the Settings dropdown (OpenRouter model ids). Free-tier models are
 # listed first since many users start on OpenRouter's free credits.
+# AVAILABLE_MODELS = [
+#     "meta-llama/llama-3.2-3b-instruct:free",
+#     "meta-llama/llama-3.3-70b-instruct:free",
+#     "google/gemini-2.0-flash-exp:free",
+#     "mistralai/mistral-7b-instruct:free",
+#     "openai/gpt-4.1-mini",
+#     "openai/gpt-4.1",
+#     "openai/gpt-4o-mini",
+#     "anthropic/claude-3.5-sonnet",
+#     "anthropic/claude-3.5-haiku",
+#     "google/gemini-2.0-flash-001",
+#     "meta-llama/llama-3.3-70b-instruct",
+#     "mistralai/mistral-large",
+# ]
 AVAILABLE_MODELS = [
-    "meta-llama/llama-3.2-3b-instruct:free",
-    "meta-llama/llama-3.3-70b-instruct:free",
-    "google/gemini-2.0-flash-exp:free",
-    "mistralai/mistral-7b-instruct:free",
-    "openai/gpt-4.1-mini",
-    "openai/gpt-4.1",
-    "openai/gpt-4o-mini",
-    "anthropic/claude-3.5-sonnet",
-    "anthropic/claude-3.5-haiku",
-    "google/gemini-2.0-flash-001",
-    "meta-llama/llama-3.3-70b-instruct",
-    "mistralai/mistral-large",
+    "openrouter/free",
 ]
+
 # Always guarantee whatever MODEL is set in .env actually appears (and is selected)
 # in the dropdown, even if it's not in the curated list above -- this is what fixes
 # the dropdown not "remembering"/matching your configured default on page load.
