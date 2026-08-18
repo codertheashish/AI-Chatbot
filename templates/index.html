@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>AI Chatbot</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+
+<body data-default-model="{{ default_model }}">
+  <div class="app" id="app">
+
+    <!-- ============================== SIDEBAR ============================== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <button class="new-chat-btn" id="newChatBtn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          New chat
+        </button>
+        <button class="icon-btn sidebar-close" id="sidebarCloseBtn" title="Close sidebar">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="sidebar-search">
+        <input type="text" id="chatSearch" placeholder="Search chats..." />
+      </div>
+
+      <div class="chat-list" id="chatList"><!-- chat items injected by JS --></div>
+
+      <div class="sidebar-footer">
+        <button class="sidebar-footer-btn" id="settingsBtn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+          &nbsp;&nbsp;&nbsp;Settings
+        </button>
+
+        <!-- Google sign-in section (client-side, via Google Identity Services) -->
+        <div id="authSection" class="auth-section">
+          <button class="sidebar-footer-btn" id="googleSignInBtn">
+            <svg width="16" height="16" viewBox="0 0 48 48">
+              <path fill="#FFC107"
+                d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z" />
+              <path fill="#FF3D00"
+                d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6.1 29.6 4 24 4c-7.7 0-14.4 4.4-17.7 10.7z" />
+              <path fill="#4CAF50"
+                d="M24 44c5.5 0 10.5-2.1 14.3-5.6l-6.6-5.6C29.6 34.7 26.9 36 24 36c-5.3 0-9.7-3.3-11.3-8l-6.6 5.1C9.6 39.6 16.2 44 24 44z" />
+              <path fill="#1976D2"
+                d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.6l6.6 5.6C41.9 36.4 44 30.7 44 24c0-1.3-.1-2.7-.4-3.5z" />
+            </svg>
+            &nbsp;&nbsp;&nbsp;Sign in with Google
+          </button>
+          <div class="auth-profile" id="authProfile" style="display:none">
+            <img id="authAvatar" class="auth-avatar" alt="" />
+            <span id="authName" class="auth-name"></span>
+            <button class="icon-btn" id="signOutBtn" title="Sign out">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- ============================== MAIN ============================== -->
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-btn" id="sidebarOpenBtn" title="Toggle sidebar">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+
+        <span class="topbar-title" id="topbarTitle">New chat</span>
+
+        <div class="topbar-actions">
+          <button class="icon-btn" id="renameBtn" title="Rename chat">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" />
+            </svg>
+          </button>
+          <button class="icon-btn" id="exportBtn" title="Download chat">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+          </button>
+          <button class="icon-btn" id="deleteBtn" title="Delete chat">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+          <button class="icon-btn" id="themeToggle" title="Toggle dark mode">
+            <svg id="themeIconMoon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+            <svg id="themeIconSun" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+              <circle cx="12" cy="12" r="5" />
+              <line x1="12" y1="1" x2="12" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="23" />
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+              <line x1="1" y1="12" x2="3" y2="12" />
+              <line x1="21" y1="12" x2="23" y2="12" />
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <section class="chat-window" id="chatWindow">
+        <div class="empty-state" id="emptyState">
+          <h1>AI Chatbot</h1>
+          <p>Ask anything, upload documents for grounded answers, or start a new chat.</p>
+        </div>
+        <div class="messages" id="messages"></div>
+      </section>
+
+      <div class="doc-chip-bar" id="docChipBar"></div>
+
+      <footer class="composer">
+        <div class="composer-inner">
+          <button class="icon-btn" id="uploadBtn" title="Attach a file (PDF / TXT / DOCX)">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          </button>
+          <input type="file" id="fileInput" accept=".pdf,.txt,.docx" hidden />
+
+          <textarea id="messageInput" placeholder="Message AI Chatbot..." rows="1"></textarea>
+
+          <select id="modelSelect" class="model-select compact" title="Choose model" autocomplete="off">
+            {% for m in models %}
+            <option value="{{ m }}" {% if m==default_model %}selected{% endif %}>{{ m }}</option>
+            {% endfor %}
+          </select>
+
+          <button class="icon-btn" id="micBtn" title="Voice input">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+              <line x1="12" y1="19" x2="12" y2="23" />
+              <line x1="8" y1="23" x2="16" y2="23" />
+            </svg>
+          </button>
+          <button class="icon-btn primary" id="sendBtn" title="Send">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="19" x2="12" y2="5" />
+              <polyline points="5 12 12 5 19 12" />
+            </svg>
+          </button>
+        </div>
+        <p class="composer-hint">AI can make mistakes. Verify important information.</p>
+      </footer>
+    </main>
+  </div>
+
+  <!-- ============================== SETTINGS MODAL ============================== -->
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Settings</h2>
+        <button class="icon-btn" id="closeSettingsBtn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <label class="modal-label">Model</label>
+        <select id="settingsModelSelect" class="model-select full-width" autocomplete="off">
+          {% for m in models %}
+          <option value="{{ m }}" {% if m==default_model %}selected{% endif %}>{{ m }}</option>
+          {% endfor %}
+        </select>
+
+        <label class="modal-label">Retrieval-Augmented Generation</label>
+        <label class="switch-row">
+          <input type="checkbox" id="ragToggle" checked />
+          <span>Use uploaded documents to ground answers (RAG)</span>
+        </label>
+
+        <label class="modal-label">Voice Output</label>
+        <label class="switch-row">
+          <input type="checkbox" id="voiceOutputToggle" />
+          <span>Read assistant replies aloud</span>
+        </label>
+
+        <label class="modal-label">Theme</label>
+        <div class="theme-buttons">
+          <button class="theme-btn" data-theme="dark">Dark</button>
+          <button class="theme-btn" data-theme="light">Light</button>
+        </div>
+
+        <p class="modal-note">
+          Your AI provider is configured securely on the server and is never exposed
+          to the browser.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rename dialog (lightweight prompt-style modal) -->
+  <div class="modal-backdrop" id="renameModal">
+    <div class="modal small">
+      <div class="modal-header">
+        <h2>Rename chat</h2>
+        <button class="icon-btn" id="closeRenameBtn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="renameInput" class="text-input" placeholder="Chat title" />
+        <button class="primary-btn" id="confirmRenameBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Google Identity Services (only used if a Google Client ID is configured in script.js) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="/static/script.js"></script>
+</body>
+
+</html>
